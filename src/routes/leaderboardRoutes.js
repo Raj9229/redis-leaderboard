@@ -54,4 +54,35 @@ router.get("/",async (res, req ) => {
   
 });
 
+
+router.get("/:userId/rank", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const rank = await redisClient.zRevRank(
+      LEADERBOARD_KEY,
+      userId
+    );
+
+    if (rank === null) {
+      return res.status(404).json({
+        error: "User not found on leaderboard"
+      });
+    }
+
+    const score = await redisClient.zScore(
+      LEADERBOARD_KEY,
+      userId
+    );
+
+    res.json({
+      userId,
+      rank: rank + 1,
+      score: Number(score)
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get user rank" });
+  }
+});
+
 module.export = router;
