@@ -20,3 +20,18 @@ router.post("/score", async (req, res) => {
         error: "Valid userId and positive integer points required"
       });
     }
+    const score = await redisClient.zIncrBy(LEADERBORD_KEY, points, userId);
+    res.json({
+      userId,
+      score : Number(score)
+    });
+  } catch (err){
+    res.status(500).json({error:
+      "failed to update "
+    });
+  }
+});
+
+
+
+module.export = router;
